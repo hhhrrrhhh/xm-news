@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.NewsMapper">
+
+    <!--ps.定义一个查询语句，下面方法可以调用，不需要重复写-->
+
+    <sql id="Base_Column_List">
+        id,title,content,time,provinces_id
+    </sql>
+
+    <!--01.查询所有文章-->
+
+    <select id="selectAll" resultType="com.example.entity.News">
+        select
+        news.*,provinces.provinces_name as provincesName
+        from news
+        left join provinces
+        on news.provinces_id = provinces.provinces_id
+        <where>
+            <if test="id != null"> and id = #{id}</if>
+            <if test="title != null"> and title like concat('%', #{title}, '%')</if>
+            <if test="content != null"> and content like concat('%', #{content}, '%')</if>
+            <if test="time != null"> and time like concat('%', #{time}, '%')</if>
+            <if test="provincesId != null"> and news.provinces_id = #{provincesId}</if>
+            <if test="provincesName != null"> and provinces.provinces_name like concat('%', #{provincesName}, '%')</if>
+        </where>
+        order by id desc
+    </select>
+
+    <!--02.新增一篇文章-->
+
+    <insert id="insert" parameterType="com.example.entity.News" useGeneratedKeys="true" keyProperty="id">
+        insert into news
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="title != null">title,</if>
+            <if test="content != null">content,</if>
+            <if test="time != null">time,</if>
+            <if test="provincesId != null">provinces_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="title != null">#{title},</if>
+            <if test="content != null">#{content},</if>
+            <if test="time != null">#{time},</if>
+            <if test="provincesId != null">#{provincesId},</if>
+        </trim>
+    </insert>
+
+    <!--03.修改一篇文章-->
+
+    <update id="updateById" parameterType="com.example.entity.News">
+        update news
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="time != null">
+                time = #{time},
+            </if>
+            <if test="provincesId != null">
+                provinces_id = #{provincesId},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--04.删除一篇文章-->
+
+    <delete id="deleteById">
+        delete from news
+        where id = #{id}
+    </delete>
+
+    <!--05.通过省份ID查询一条文章信息，返回给文章实体类-->
+
+    <select id="selectById" resultType="com.example.entity.News">
+        select
+        <include refid="Base_Column_List" />
+        from news
+        where id = #{id}
+    </select>
+
+</mapper>

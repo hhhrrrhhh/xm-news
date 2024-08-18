@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ProvincesMapper">
+
+
+    <!--ps.定义一个查询语句，下面方法可以调用，不需要重复写-->
+
+    <sql id="Base_Column_List">
+        provinces_id,provinces_name
+    </sql>
+
+    <!--01.查询所有省份-->
+
+    <select id="selectAll" resultType="com.example.entity.Provinces">
+        select
+        <include refid="Base_Column_List" />
+        from provinces
+        <where>
+            <if test="provincesId != null"> and provinces_id = #{provincesId}</if>
+            <if test="provincesName"> and provinces_name like concat('%', #{provincesName}, '%')</if>
+        </where>
+    </select>
+
+    <!--02.新增一个省份-->
+
+    <insert id="insert" parameterType="com.example.entity.Provinces" useGeneratedKeys="true" keyProperty="provincesId">
+        insert into provinces
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="provincesId != null">provinces_id,</if>
+            <if test="provincesName != null">provinces_name,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="provincesId != null">#{provincesId},</if>
+            <if test="provincesName != null">#{provincesName},</if>
+        </trim>
+    </insert>
+
+    <!--03.修改一个省份的信息-->
+
+    <update id="updateById" parameterType="com.example.entity.Provinces">
+        update provinces
+        <set>
+            <if test="provincesName != null">
+                provinces_name = #{provincesName},
+            </if>
+        </set>
+        where provinces_id = #{provincesId}
+    </update>
+
+    <!--04.删除一个省份的信息-->
+
+    <delete id="deleteById">
+        delete from provinces
+        where provinces_id = #{provincesId}
+    </delete>
+
+    <!--05.通过省份ID查询一条省份所有信息，返回给省份实体类-->
+
+    <select id="selectById" resultType="com.example.entity.Provinces">
+        select
+        <include refid="Base_Column_List" />
+        from provinces
+        where provinces_id = #{provincesId}
+    </select>
+
+</mapper>
